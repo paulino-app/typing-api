@@ -1,6 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { createJson } from './file';
+import { Performance } from './schema/typingPerformance';
+import mongoose from 'mongoose';
+
+await mongoose.connect(Bun.env.MONGO_URL as string, { dbName: 'typing' });
 
 const app = new Hono();
 
@@ -16,7 +19,7 @@ const wordLanguage: any = {
 };
 
 app.get('/words', async (context) => {
-  const { amount, language, type } = context.req.query();
+  const { mode, language, amount, preset, characters } = context.req.query();
 
   const wordsAmount = parseInt(amount);
   const path = wordLanguage[language] ?? wordLanguage.english;
@@ -29,19 +32,28 @@ app.get('/words', async (context) => {
   return context.json({ words: randomWords, text: randomWords.join(' ') }, 200);
 });
 
-// app.get('/words/english/random', async (context) => {
-//   const { amount } = context.req.query();
+app.get('/performance', async (context) => {
+  try {
+    const document = await Performance.find();
+    return context.json(document, 200);
+  } catch (error) {
+    console.log(error);
+    return context.json({ error: error }, 400);
+  }
+});
 
-//   const wordsAmount = parseInt(amount);
+app.post('/performance', async (context) => {
+  console.log('creting record...');
 
-//   const path = './output2.json';
-//   const file = Bun.file(path);
-//   const words = await file.json();
-
-//   const randomWords = randomString(words, wordsAmount);
-
-//   return context.json({ words: randomWords, text: randomWords.join(' ') }, 200);
-// });
+  const body = await context.req.json();
+  try {
+    const document = await Performance.create(body);
+    return context.json(document, 200);
+  } catch (error) {
+    console.log(error);
+    return context.json({ error: error }, 400);
+  }
+});
 
 function randomString(words: string[], wordsAmount: number) {
   const randomWords: string[] = [];
