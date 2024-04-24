@@ -1,30 +1,33 @@
 import { write } from 'bun';
 
 export async function createJson() {
-  const path: string = './en1.txt';
+  const path: string = './words/new1.json';
   const file = Bun.file(path);
-  const text = await file.text();
+  const text = await file.json();
 
-  const words = text.split(/\r?\n/);
-  words.sort();
+  const words = text.words;
+  // words.sort();
+
   // console.log(words);
-  // const wordsWithSymbols = findWordsWithNonAlphanumeric(words);
-  // console.log(wordsWithSymbols); // Output: ['world!', 'good#day']
+  const wordsWithSymbols = findWordsWithNonAlphanumeric(words);
+  console.log(wordsWithSymbols); // Output: ['world!', 'good#day']
 
-  // console.log(11, findRepeatedWords(words));
-  const jsonData: string = JSON.stringify(words, null, 2);
+  // const jsonData: string = JSON.stringify(words, null, 2);
+
+  // console.log(1, findRepeatedWords(words));
 
   // console.log(jsonData);
 
   // Write the JSON data to a file
-  write('output2.json', jsonData)
-    .then(() => {
-      console.log('File has been written successfully.');
-    })
-    .catch((error) => {
-      console.error('Error writing file:', error);
-    });
+  // write('output2.json', jsonData)
+  //   .then(() => {
+  //     console.log('File has been written successfully.');
+  //   })
+  //   .catch((error) => {
+  //     console.error('Error writing file:', error);
+  //   });
 }
+
 
 function findRepeatedWords(words: string[]): string[] {
   const wordCount: Record<string, number> = {};
@@ -48,7 +51,7 @@ function findRepeatedWords(words: string[]): string[] {
 function findWordsWithNonAlphanumeric(words: string[]): string[] {
   const nonAlphanumericWords: any = [];
   // Regular expression to match characters that are not letters, specific special characters, or numbers
-  const regex = /[^a-zA-Z0-9áóéúíñ]/;
+  const regex = /[^a-zA-Z0-9áóéúíñü]/;
 
   // Check each word for non-alphanumeric characters, excluding specific accented letters
   words.forEach((word, index) => {
@@ -60,4 +63,4 @@ function findWordsWithNonAlphanumeric(words: string[]): string[] {
   return nonAlphanumericWords;
 }
 
-// createJson();
+createJson();
